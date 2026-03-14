@@ -25,3 +25,5 @@ skip_directories:
 data_dir: "./data"
 
 embedding_model: "all-MiniLM-L6-v2"
+
+debounce_seconds: 5
