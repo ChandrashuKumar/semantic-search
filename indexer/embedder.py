@@ -21,9 +21,9 @@ class Embedder:
             config=yaml.safe_load(f)
         
         model_name = config["embedding_model"]
-        print(f"Loading embedding model '{model_name}'...")
+        #print(f"Loading embedding model '{model_name}'...")
         self.model = SentenceTransformer(model_name)
-        print("Model loaded.")
+        #print("Model loaded.")
 
     def embed_chunks(self, chunks):
         """

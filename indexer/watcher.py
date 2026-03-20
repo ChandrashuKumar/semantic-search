@@ -73,10 +73,10 @@ class IndexHandler(FileSystemEventHandler):
         if self._is_duplicate(event.src_path):
             return
 
-        print(f"New file detected: {event.src_path}")
+        #print(f"New file detected: {event.src_path}")
         text = self.pipeline.extractor.extract(event.src_path)
         if(not text.strip()):
-            print(f"  Skipping (no text extracted)")
+            #print(f"  Skipping (no text extracted)")
             return
         
         chunks = self.pipeline.chunker.chunk_file(text, event.src_path)
@@ -87,7 +87,7 @@ class IndexHandler(FileSystemEventHandler):
 
         file_hash = self.pipeline.crawler.compute_hash(event.src_path)
         self.pipeline.store.save_file_info(event.src_path, file_hash, len(chunks))
-        print(f"  File stored: {event.src_path}")
+        #print(f"  File stored: {event.src_path}")
 
 
     def on_modified(self, event):
@@ -106,12 +106,12 @@ class IndexHandler(FileSystemEventHandler):
         if self._is_duplicate(event.src_path):
             return
 
-        print(f"File modified: {event.src_path}")
+        #print(f"File modified: {event.src_path}")
 
         self.pipeline.store.remove_file_chunks(event.src_path)
         text = self.pipeline.extractor.extract(event.src_path)
         if(not text.strip()):
-            print(f"  Skipping (no text extracted)")
+            #print(f"  Skipping (no text extracted)")
             return
         
         chunks = self.pipeline.chunker.chunk_file(text, event.src_path)
@@ -121,7 +121,7 @@ class IndexHandler(FileSystemEventHandler):
 
         file_hash = self.pipeline.crawler.compute_hash(event.src_path)
         self.pipeline.store.save_file_info(event.src_path, file_hash, len(chunks))
-        print(f"  File saved: {event.src_path}")
+        #print(f"  File saved: {event.src_path}")
 
     def on_deleted(self, event):
         """
@@ -136,7 +136,7 @@ class IndexHandler(FileSystemEventHandler):
         if(not self._is_relevant(event.src_path)):
             return
 
-        print(f"File deleted: {event.src_path}")
+        #print(f"File deleted: {event.src_path}")
         self.pipeline.store.remove_file_chunks(event.src_path)
 
 
