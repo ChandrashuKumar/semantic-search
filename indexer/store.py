@@ -177,7 +177,7 @@ class Store:
             return self.index.ntotal
 
 
-# --- Test it ---
+# --- Test ---
 if __name__ == "__main__":
     import numpy as np
 

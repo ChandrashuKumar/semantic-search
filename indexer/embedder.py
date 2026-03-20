@@ -52,7 +52,7 @@ class Embedder:
         return self.model.encode(text)
 
 
-# --- Test it ---
+# --- Test ---
 if __name__ == "__main__":
     embedder = Embedder()
 

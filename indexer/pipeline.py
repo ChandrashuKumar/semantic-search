@@ -1,5 +1,7 @@
 # indexer/pipeline.py
 
+import yaml
+
 from indexer.crawler import Crawler
 from indexer.extractor import Extractor
 from indexer.chunker import Chunker
@@ -10,7 +12,7 @@ from indexer.store import Store
 class IndexingPipeline:
     """
     Wires all indexer modules together.
-    
+
     The flow for each file:
         Crawler (discover + hash check)
             → Extractor (file → raw text)
@@ -23,9 +25,15 @@ class IndexingPipeline:
         """
         Initialize all pipeline components.
         """
+        with open(config_path, "r") as f:
+            config = yaml.safe_load(f)
+
         self.crawler = Crawler(config_path)
         self.extractor = Extractor()
-        self.chunker = Chunker(chunk_size=500, overlap=50)
+        self.chunker = Chunker(
+            chunk_size=config.get("chunk_size", 500),
+            overlap=config.get("overlap", 50),
+        )
         self.embedder = Embedder(config_path)
         self.store = Store(config_path)
 
@@ -63,7 +71,7 @@ class IndexingPipeline:
         print(f"Total vectors: {self.store.get_total_vectors()}")
 
 
-# --- Test it ---
+# --- Test ---
 if __name__ == "__main__":
     pipeline = IndexingPipeline()
     pipeline.run()

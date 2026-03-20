@@ -26,4 +26,11 @@ data_dir: "./data"
 
 embedding_model: "all-MiniLM-L6-v2"
 
+#chunking parameters
+chunk_size: 200
+overlap: 30
+
+#watchdog configuration
 debounce_seconds: 5
+
+reranker_model: "cross-encoder/ms-marco-MiniLM-L-6-v2"

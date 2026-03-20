@@ -100,7 +100,7 @@ class Extractor:
             return f.read()
 
 
-# --- Test it ---
+# --- Test ---
 if __name__ == "__main__":
     import sys
 

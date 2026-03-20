@@ -89,7 +89,7 @@ class Crawler:
         return files_to_process, current_hashes, deleted_files
 
 
-# --- Test it ---
+# --- Test ---
 if __name__ == "__main__":
     crawler = Crawler()
     files = crawler.discover_files()

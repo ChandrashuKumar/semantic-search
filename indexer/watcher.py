@@ -175,7 +175,7 @@ class Watcher:
             observer.join()
 
 
-# --- Test it ---
+# --- Test ---
 if __name__ == "__main__":
     # First run the full pipeline to index existing files
     print("Running initial index...")

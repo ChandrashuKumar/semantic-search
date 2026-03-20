@@ -114,7 +114,7 @@ class Chunker:
         return results
 
 
-# --- Test it ---
+# --- Test ---
 if __name__ == "__main__":
     chunker = Chunker(chunk_size=10, overlap=3)
 
