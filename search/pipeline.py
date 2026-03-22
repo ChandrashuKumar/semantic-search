@@ -21,12 +21,12 @@ class SearchPipeline:
             → Final results
     """
 
-    def __init__(self, config_path="config.yaml"):
+    def __init__(self, config_path="config.yaml", embedder=None):
         """
         Initialize all search components.
         """
         self.query_expander = QueryExpander(max_synonyms_per_word=3)
-        self.dense = DenseSearch(config_path)
+        self.dense = DenseSearch(config_path,embedder=embedder)
         self.sparse = SparseSearch(config_path)
         self.fusion = RRFFusion(k=60)
         self.reranker = Reranker(config_path)

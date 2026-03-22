@@ -146,11 +146,11 @@ class Watcher:
     Runs continuously until the user presses Ctrl+C.
     """
 
-    def __init__(self, config_path="config.yaml"):
+    def __init__(self, pipeline=None, config_path="config.yaml"):
         """
         Initialize the Watcher.
         """
-        self.pipeline = IndexingPipeline(config_path)
+        self.pipeline = pipeline or IndexingPipeline(config_path)
         self.handler = IndexHandler(self.pipeline)
         self.watch_paths = self.pipeline.crawler.watch_paths
 

@@ -67,12 +67,12 @@ def main():
         indexing_pipeline = IndexingPipeline()
         indexing_pipeline.run()
 
-        watcher = Watcher()
+        watcher = Watcher(pipeline=indexing_pipeline)
         observer = start_watcher_background(watcher)
 
         print("Welcome to the search engine! Type a query to search ('exit' or 'quit' to quit).\n")
 
-        search_pipeline = SearchPipeline()
+        search_pipeline = SearchPipeline(embedder=indexing_pipeline.embedder)
 
         search_loop(search_pipeline)
 

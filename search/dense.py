@@ -16,11 +16,11 @@ class DenseSearch:
         - indices: the vector IDs of the closest matches
     """
 
-    def __init__(self, config_path="config.yaml"):
+    def __init__(self, config_path="config.yaml", embedder=None):
         """
         Initialize the Embedder and Store modules.
         """
-        self.embedder = Embedder(config_path)
+        self.embedder = embedder or Embedder(config_path)
         self.store = Store(config_path)
 
     def search(self, query, top_k=20):
