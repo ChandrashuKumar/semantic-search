@@ -3,6 +3,10 @@
 
 # Index data (generated at runtime)
 data/
+data_eval/
+
+#datasets
+datasets/
 
 # Python cache
 __pycache__/
