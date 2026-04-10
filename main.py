@@ -1,10 +1,12 @@
 # main.py
 import os
-os.environ["TOKENIZERS_PARALLELISM"] = "false"
-os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
-os.environ["HF_HUB_VERBOSITY"] = "error"
-os.environ["TRANSFORMERS_VERBOSITY"] = "error"
-os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
+import threading
+import yaml
+# os.environ["TOKENIZERS_PARALLELISM"] = "false"
+# os.environ["TRANSFORMERS_NO_ADVISORY_WARNINGS"] = "1"
+# os.environ["HF_HUB_VERBOSITY"] = "error"
+# os.environ["TRANSFORMERS_VERBOSITY"] = "error"
+# os.environ["HF_HUB_DISABLE_PROGRESS_BARS"] = "1"
 
 
 from indexer.pipeline import IndexingPipeline
@@ -64,6 +66,22 @@ def main():
     observer = None
 
     try:
+        with open("config.yaml") as f:
+            config = yaml.safe_load(f)
+
+        reranker_model = None
+
+        def _load_reranker():
+            nonlocal reranker_model
+            from sentence_transformers import CrossEncoder
+            try:
+                reranker_model = CrossEncoder(config["reranker_model"], local_files_only=True)
+            except Exception:
+                reranker_model = CrossEncoder(config["reranker_model"])
+
+        reranker_thread = threading.Thread(target=_load_reranker, daemon=True)
+        reranker_thread.start()
+
         indexing_pipeline = IndexingPipeline()
         indexing_pipeline.run()
 
@@ -72,7 +90,11 @@ def main():
 
         print("Welcome to the search engine! Type a query to search ('exit' or 'quit' to quit).\n")
 
-        search_pipeline = SearchPipeline(embedder=indexing_pipeline.embedder)
+        reranker_thread.join()
+        search_pipeline = SearchPipeline(
+            embedder=indexing_pipeline.embedder,
+            reranker_model=reranker_model,
+        )
 
         search_loop(search_pipeline)
 

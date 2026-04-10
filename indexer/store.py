@@ -52,7 +52,8 @@ class Store:
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS files (
                 filepath TEXT PRIMARY KEY,
-                file_hash TEXT NOT NULL,
+                mtime REAL NOT NULL,
+                size INTEGER NOT NULL,
                 total_chunks INTEGER
             )
         ''')
@@ -117,36 +118,24 @@ class Store:
         conn.close()
         
 
-    def save_file_info(self, filepath, file_hash, total_chunks):
-        """
-        Save file hashes to SQLite. 
-        Args:
-            hashes (dict) — {filepath: hash_string}
-        """
+    def save_file_info(self, filepath, mtime, size, total_chunks):
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         cursor.execute(
-                "INSERT OR REPLACE INTO files (filepath, file_hash, total_chunks) VALUES (?, ?, ?)",
-                (filepath, file_hash, total_chunks)
-            )
-            
+            "INSERT OR REPLACE INTO files (filepath, mtime, size, total_chunks) VALUES (?, ?, ?, ?)",
+            (filepath, mtime, size, total_chunks)
+        )
         conn.commit()
         conn.close()
         
 
-    def load_hashes(self):
-        """
-        Load previously stored file hashes from SQLite.
-
-        Returns:
-            dict — {filepath: hash_string}
-        """
+    def load_file_info(self):
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
-        cursor.execute("SELECT filepath, file_hash FROM files")
+        cursor.execute("SELECT filepath, mtime, size FROM files")
         rows = cursor.fetchall()
         conn.close()
-        return {row[0]: row[1] for row in rows}
+        return {row[0]: {"mtime": row[1], "size": row[2]} for row in rows}
     
     
     def remove_file_chunks(self, filepath):

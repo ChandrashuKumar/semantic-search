@@ -1,7 +1,6 @@
 # indexer/crawler.py
 
 import os
-import hashlib
 import yaml
 
 
@@ -42,51 +41,40 @@ class Crawler:
         return results        
 
         
-    def compute_hash(self, filepath):
+    def get_new_and_modified(self, known_file_info=None):
         """
-        Compute the SHA-256 hash of a file's contents.
-
-        Args:
-            filepath (str) — absolute path to the file
-
-        Returns:
-            str — hex string of the SHA-256 hash
-        """
-        hasher = hashlib.sha256()
-        with open(filepath, "rb") as f:
-            while chunk := f.read(8192):
-                hasher.update(chunk)
-        return hasher.hexdigest()   
-
-    def get_new_and_modified(self, known_hashes=None):
-        """
-        Compare discovered files against previously known hashes to find
+        Compare discovered files against stored mtime+size to find
         which files are new or have been modified since last run.
 
         Args:
-            known_hashes (dict) — {filepath: hash} from previous run
-                                   Pass None or {} on first run.
+            known_file_info (dict) — {filepath: {"mtime": ..., "size": ...}}
 
         Returns:
-            tuple: (files_to_process, current_hashes, deleted_files)
+            tuple: (files_to_process, current_file_info, deleted_files)
             - files_to_process: list[str] — paths that are new or changed
-            - current_hashes: dict — {filepath: hash} for ALL current files
-            - deleted files: list[str] — files that were deleted
+            - current_file_info: dict — {filepath: {"mtime": ..., "size": ...}}
+            - deleted_files: set[str] — files that were deleted
         """
-        if known_hashes is None:
-            known_hashes = {}
+        if known_file_info is None:
+            known_file_info = {}
+
         current_files = self.discover_files()
         files_to_process = []
-        current_hashes = {}
-        for file in current_files:
-            file_hash = self.compute_hash(file)
-            if file not in known_hashes or file_hash != known_hashes[file]:
-                files_to_process.append(file)
-            current_hashes[file] = file_hash
-        
-        deleted_files = set(known_hashes.keys()) - set(current_hashes.keys())
-        
-        return files_to_process, current_hashes, deleted_files
+        current_file_info = {}
+
+        for filepath in current_files:
+            stat = os.stat(filepath)
+            mtime = stat.st_mtime
+            size = stat.st_size
+            current_file_info[filepath] = {"mtime": mtime, "size": size}
+
+            known = known_file_info.get(filepath)
+            if not known or known["mtime"] != mtime or known["size"] != size:
+                files_to_process.append(filepath)
+
+        deleted_files = set(known_file_info.keys()) - set(current_file_info.keys())
+
+        return files_to_process, current_file_info, deleted_files
 
 
 # --- Test ---

@@ -85,8 +85,8 @@ class IndexHandler(FileSystemEventHandler):
         self.pipeline.store.remove_file_chunks(event.src_path)
         self.pipeline.store.add_chunks(chunks, embeddings)
 
-        file_hash = self.pipeline.crawler.compute_hash(event.src_path)
-        self.pipeline.store.save_file_info(event.src_path, file_hash, len(chunks))
+        stat = os.stat(event.src_path)
+        self.pipeline.store.save_file_info(event.src_path, stat.st_mtime, stat.st_size, len(chunks))
         #print(f"  File stored: {event.src_path}")
 
 
@@ -119,8 +119,8 @@ class IndexHandler(FileSystemEventHandler):
         embeddings = self.pipeline.embedder.embed_chunks(chunk_texts)
         self.pipeline.store.add_chunks(chunks, embeddings)
 
-        file_hash = self.pipeline.crawler.compute_hash(event.src_path)
-        self.pipeline.store.save_file_info(event.src_path, file_hash, len(chunks))
+        stat = os.stat(event.src_path)
+        self.pipeline.store.save_file_info(event.src_path, stat.st_mtime, stat.st_size, len(chunks))
         #print(f"  File saved: {event.src_path}")
 
     def on_deleted(self, event):

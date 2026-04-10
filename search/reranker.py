@@ -9,13 +9,16 @@ class Reranker:
     Re-ranks search results using a cross-encoder model.
     """
 
-    def __init__(self, config_path="config.yaml"):
+    def __init__(self, config_path="config.yaml", model=None):
         """
-        Load the cross-encoder model.
+        Load the cross-encoder model, or accept a pre-loaded one.
         """
-        with open(config_path, "r") as f:
-            config = yaml.safe_load(f)
-        self.model = CrossEncoder(config["reranker_model"])
+        if model is not None:
+            self.model = model
+        else:
+            with open(config_path, "r") as f:
+                config = yaml.safe_load(f)
+            self.model = CrossEncoder(config["reranker_model"])
 
     def rerank(self, query, results, top_k=10):
         """

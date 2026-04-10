@@ -41,9 +41,9 @@ class IndexingPipeline:
         """
         Execute the full indexing pipeline.
         """
-        known_hashes = self.store.load_hashes()
+        known_file_info = self.store.load_file_info()
         #print("Scanning for new/modified files...")
-        files_to_process, current_hashes, deleted_files = self.crawler.get_new_and_modified(known_hashes)
+        files_to_process, current_file_info, deleted_files = self.crawler.get_new_and_modified(known_file_info)
 
         for filepath in deleted_files:
             self.store.remove_file_chunks(filepath)
@@ -65,7 +65,8 @@ class IndexingPipeline:
             embeddings = self.embedder.embed_chunks(chunk_texts)
             self.store.remove_file_chunks(filepath)
             self.store.add_chunks(chunks, embeddings)
-            self.store.save_file_info(filepath, current_hashes[filepath], len(chunks))
+            info = current_file_info[filepath]
+            self.store.save_file_info(filepath, info["mtime"], info["size"], len(chunks))
 
         print(f"\nIndex updated")
         print(f"Total vectors: {self.store.get_total_vectors()}")
